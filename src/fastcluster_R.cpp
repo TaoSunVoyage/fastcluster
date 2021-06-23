@@ -102,7 +102,7 @@ void order_nodes(const int N, const int * const merge, const t_index * const nod
 #define size_(r_) ( ((r_<N) ? 1 : node_size[r_-N]) )
 
 template <const bool sorted>
-void generate_R_dendrogram(int * const merge, double * const height, int * const order, cluster_result & Z2, const int N) {
+void generate_R_dendrogram(int * const merge, t_float * const height, int * const order, cluster_result & Z2, const int N) {
   // The array "nodes" is a union-find data structure for the cluster
   // identites (only needed for unsorted cluster_result input).
   union_find nodes(sorted ? 0 : N);
@@ -294,12 +294,12 @@ public:
     }
   }
 
-  double ward(t_index const i1, t_index const i2) const {
+  t_float ward(t_index const i1, t_index const i2) const {
     return sqeuclidean<true>(i1,i2)*members[i1]*members[i2]/    \
       (members[i1]+members[i2]);
   }
 
-  inline double ward_initial(t_index const i1, t_index const i2) const {
+  inline t_float ward_initial(t_index const i1, t_index const i2) const {
     /* In the R interface, ward_initial is the same as ward. Only the Python
        interface has two different functions here. */
     return ward(i1,i2);
@@ -311,7 +311,7 @@ public:
     return min;
   }
 
-  double ward_extended(t_index i1, t_index i2) const {
+  t_float ward_extended(t_index i1, t_index i2) const {
     return ward(row_repr[i1], row_repr[i2]);
   }
 
@@ -350,14 +350,14 @@ public:
   */
   // still public
   template <const bool check_NaN>
-  double sqeuclidean(t_index const i1, t_index const i2) const {
-    double dev, dist;
+  t_float sqeuclidean(t_index const i1, t_index const i2) const {
+    t_float dev, dist;
     int count, j;
 
     count = 0;
     dist = 0;
-    double * p1 = x+i1*nc;
-    double * p2 = x+i2*nc;
+    t_float * p1 = x+i1*nc;
+    t_float * p2 = x+i2*nc;
     for(j = 0 ; j < nc ; ++j) {
       if(both_non_NA(*p1, *p2)) {
         dev = (*p1 - *p2);
@@ -370,7 +370,7 @@ public:
       ++p2;
     }
     if(count == 0) return NA_REAL;
-    if(count != nc) dist /= (static_cast<double>(count)/static_cast<double>(nc));
+    if(count != nc) dist /= (static_cast<t_float>(count)/static_cast<t_float>(nc));
     //return sqrt(dist);
     // we take the square root later
     if (check_NaN) {
@@ -380,19 +380,19 @@ public:
     return dist;
   }
 
-  inline double sqeuclidean_extended(t_index const i1, t_index const i2) const {
+  inline t_float sqeuclidean_extended(t_index const i1, t_index const i2) const {
     return sqeuclidean<true>(row_repr[i1], row_repr[i2]);
   }
 
 private:
-  double maximum(t_index i1, t_index i2) const {
-    double dev, dist;
+  t_float maximum(t_index i1, t_index i2) const {
+    t_float dev, dist;
     int count, j;
 
     count = 0;
     dist = -DBL_MAX;
-    double * p1 = x+i1*nc;
-    double * p2 = x+i2*nc;
+    t_float * p1 = x+i1*nc;
+    t_float * p2 = x+i2*nc;
     for(j = 0 ; j < nc ; ++j) {
       if(both_non_NA(*p1, *p2)) {
         dev = std::abs(*p1 - *p2);
@@ -409,14 +409,14 @@ private:
     return dist;
   }
 
-  double manhattan(t_index i1, t_index i2) const {
-    double dev, dist;
+  t_float manhattan(t_index i1, t_index i2) const {
+    t_float dev, dist;
     int count, j;
 
     count = 0;
     dist = 0;
-    double * p1 = x+i1*nc;
-    double * p2 = x+i2*nc;
+    t_float * p1 = x+i1*nc;
+    t_float * p2 = x+i2*nc;
     for(j = 0 ; j < nc ; ++j) {
       if(both_non_NA(*p1, *p2)) {
         dev = std::abs(*p1 - *p2);
@@ -429,18 +429,18 @@ private:
       ++p2;
     }
     if(count == 0) return NA_REAL;
-    if(count != nc) dist /= (static_cast<double>(count)/static_cast<double>(nc));
+    if(count != nc) dist /= (static_cast<t_float>(count)/static_cast<t_float>(nc));
     return dist;
   }
 
-  double canberra(t_index i1, t_index i2) const {
-    double dev, dist, sum, diff;
+  t_float canberra(t_index i1, t_index i2) const {
+    t_float dev, dist, sum, diff;
     int count, j;
 
     count = 0;
     dist = 0;
-    double * p1 = x+i1*nc;
-    double * p2 = x+i2*nc;
+    t_float * p1 = x+i1*nc;
+    t_float * p2 = x+i2*nc;
     for(j = 0 ; j < nc ; ++j) {
       if(both_non_NA(*p1, *p2)) {
         sum = std::abs(*p1) + std::abs(*p2);
@@ -459,18 +459,18 @@ private:
       ++p2;
     }
     if(count == 0) return NA_REAL;
-    if(count != nc) dist /= (static_cast<double>(count)/static_cast<double>(nc));
+    if(count != nc) dist /= (static_cast<t_float>(count)/static_cast<t_float>(nc));
     return dist;
   }
 
-  double canberra_old(t_index i1, t_index i2) const {
-    double dev, dist, sum, diff;
+  t_float canberra_old(t_index i1, t_index i2) const {
+    t_float dev, dist, sum, diff;
     int count, j;
 
     count = 0;
     dist = 0;
-    double * p1 = x+i1*nc;
-    double * p2 = x+i2*nc;
+    t_float * p1 = x+i1*nc;
+    t_float * p2 = x+i2*nc;
     for(j = 0 ; j < nc ; ++j) {
       if(both_non_NA(*p1, *p2)) {
         sum = std::abs(*p1 + *p2);
@@ -489,19 +489,19 @@ private:
       ++p2;
     }
     if(count == 0) return NA_REAL;
-    if(count != nc) dist /= (static_cast<double>(count)/static_cast<double>(nc));
+    if(count != nc) dist /= (static_cast<t_float>(count)/static_cast<t_float>(nc));
     return dist;
   }
 
-  double dist_binary(t_index i1, t_index i2) const {
+  t_float dist_binary(t_index i1, t_index i2) const {
     int total, count, dist;
     int j;
 
     total = 0;
     count = 0;
     dist = 0;
-    double * p1 = x+i1*nc;
-    double * p2 = x+i2*nc;
+    t_float * p1 = x+i1*nc;
+    t_float * p2 = x+i2*nc;
     for(j = 0 ; j < nc ; ++j) {
       if(both_non_NA(*p1, *p2)) {
         if(!both_FINITE(*p1, *p2)) {
@@ -523,17 +523,17 @@ private:
 
     if(total == 0) return NA_REAL;
     if(count == 0) return 0;
-    return static_cast<double>(dist) / static_cast<double>(count);
+    return static_cast<t_float>(dist) / static_cast<t_float>(count);
   }
 
-  double minkowski(t_index i1, t_index i2) const {
-    double dev, dist;
+  t_float minkowski(t_index i1, t_index i2) const {
+    t_float dev, dist;
     int count, j;
 
     count= 0;
     dist = 0;
-    double * p1 = x+i1*nc;
-    double * p2 = x+i2*nc;
+    t_float * p1 = x+i1*nc;
+    t_float * p2 = x+i2*nc;
     for(j = 0 ; j < nc ; ++j) {
       if(both_non_NA(*p1, *p2)) {
         dev = (*p1 - *p2);
@@ -546,7 +546,7 @@ private:
       ++p2;
     }
     if(count == 0) return NA_REAL;
-    if(count != nc) dist /= (static_cast<double>(count)/static_cast<double>(nc));
+    if(count != nc) dist /= (static_cast<t_float>(count)/static_cast<t_float>(nc));
     //return R_pow(dist, 1.0/p);
     // raise to the (1/p)-th power later
     return dist;
@@ -602,10 +602,10 @@ extern "C" {
       PROTECT(D_ = AS_NUMERIC(D_));
       if (XLENGTH(D_)!=NN)
         Rf_error("'D' must have length (N \\choose 2).");
-      const double * const D = NUMERIC_POINTER(D_);
+      const t_float * const D = NUMERIC_POINTER(D_);
       // Make a working copy of the dissimilarity array
       // for all methods except "single".
-      auto_array_ptr<double> D__;
+      auto_array_ptr<t_float> D__;
       if (method!=METHOD_METR_SINGLE) {
         D__.init(NN);
         for (R_xlen_t i=0; i<NN; ++i)
@@ -665,7 +665,7 @@ extern "C" {
 
       SEXP h; // return field "height"
       PROTECT(h = NEW_NUMERIC(N-1));
-      double * const height = NUMERIC_POINTER(h);
+      t_float * const height = NUMERIC_POINTER(h);
 
       SEXP o; // return fiels "order'
       PROTECT(o = NEW_INTEGER(N));
@@ -758,10 +758,10 @@ extern "C" {
         Rf_error("There must be at least two data points.");
       // Make a working copy of the dissimilarity array
       // for all methods except "single".
-      double * X__ = NUMERIC_POINTER(X_);
+      t_float * X__ = NUMERIC_POINTER(X_);
       // Copy the input array and change it from Fortran-contiguous style
       // to C-contiguous style.
-      auto_array_ptr<double> X(LENGTH(X_));
+      auto_array_ptr<t_float> X(LENGTH(X_));
       for (std::ptrdiff_t i=0; i<N; ++i)
         for (std::ptrdiff_t j=0; j<dim; ++j)
           X[i*dim+j] = X__[i+j*N];
@@ -787,7 +787,7 @@ extern "C" {
       }
 
       // Parameter p
-      double p = 0;
+      t_float p = 0;
       if (metric==METRIC_R_MINKOWSKI) {
         if (!IS_NUMERIC(p_) || LENGTH(p_)!=1)
           Rf_error("'p' must be a single floating point number.");
@@ -857,7 +857,7 @@ extern "C" {
 
       SEXP h; // return field "height"
       PROTECT(h = NEW_NUMERIC(N-1));
-      double * const height = NUMERIC_POINTER(h);
+      t_float * const height = NUMERIC_POINTER(h);
 
       SEXP o; // return fiels "order'
       PROTECT(o = NEW_INTEGER(N));
