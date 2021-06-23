@@ -592,7 +592,7 @@ extern "C" {
           PROTECT(members_ = AS_NUMERIC(members_));
           if (LENGTH(members_)!=N)
             Rf_error("'members' must have length N.");
-          const t_float * const m = NUMERIC_POINTER(members_);
+          const t_float * const m = (float)NUMERIC_POINTER(members_);
           for (t_index i=0; i<N; ++i) members[i] = m[i];
           UNPROTECT(1); // members_
         }
@@ -602,7 +602,7 @@ extern "C" {
       PROTECT(D_ = AS_NUMERIC(D_));
       if (XLENGTH(D_)!=NN)
         Rf_error("'D' must have length (N \\choose 2).");
-      const t_float * const D = NUMERIC_POINTER(D_);
+      const t_float * const D = (float)NUMERIC_POINTER(D_);
       // Make a working copy of the dissimilarity array
       // for all methods except "single".
       auto_array_ptr<t_float> D__;
@@ -665,7 +665,7 @@ extern "C" {
 
       SEXP h; // return field "height"
       PROTECT(h = NEW_NUMERIC(N-1));
-      t_float * const height = NUMERIC_POINTER(h);
+      t_float * const height = (float)NUMERIC_POINTER(h);
 
       SEXP o; // return fiels "order'
       PROTECT(o = NEW_INTEGER(N));
@@ -758,7 +758,7 @@ extern "C" {
         Rf_error("There must be at least two data points.");
       // Make a working copy of the dissimilarity array
       // for all methods except "single".
-      t_float * X__ = NUMERIC_POINTER(X_);
+      t_float * X__ = (float)NUMERIC_POINTER(X_);
       // Copy the input array and change it from Fortran-contiguous style
       // to C-contiguous style.
       auto_array_ptr<t_float> X(LENGTH(X_));
@@ -780,7 +780,7 @@ extern "C" {
           PROTECT(members_ = AS_NUMERIC(members_));
           if (LENGTH(members_)!=N)
             Rf_error("The length of 'members' must be the same as the number of data points.");
-          const t_float * const m = NUMERIC_POINTER(members_);
+          const t_float * const m = (float)NUMERIC_POINTER(members_);
           for (t_index i=0; i<N; ++i) members[i] = m[i];
           UNPROTECT(1); // members_
         }
@@ -857,7 +857,7 @@ extern "C" {
 
       SEXP h; // return field "height"
       PROTECT(h = NEW_NUMERIC(N-1));
-      t_float * const height = NUMERIC_POINTER(h);
+      t_float * const height = (float)NUMERIC_POINTER(h);
 
       SEXP o; // return fiels "order'
       PROTECT(o = NEW_INTEGER(N));
